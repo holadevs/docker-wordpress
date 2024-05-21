@@ -1,0 +1,49 @@
+services:
+  database:
+    container_name: db_holadevs
+    image: mariadb:10.4.8-bionic
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    volumes:
+      - dbdataholadevs:/var/lib/mysql
+    networks:
+      - wp-holadevs-test
+  phpmyadmin:
+    container_name: phpmyadmin_holadevs
+    depends_on:
+      - database
+    image: phpmyadmin
+    ports:
+      - 9090:80
+    environment:
+      PMA_HOST: database
+      UPLOAD_LIMIT: 400MB
+    networks:
+      - wp-holadevs-test
+  wordpress:
+    container_name: wordpress_holadevs
+    depends_on:
+      - database
+    image: wordpress:latest
+    environment:
+      - WORDPRESS_DB_HOST=database
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_DB_NAME=wordpress
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - 8989:80
+    networks:
+      - wp-holadevs-test
+
+volumes:
+  wordpress:
+  dbdataholadevs:
+
+networks:
+  wp-holadevs-test:
+    driver: bridge
